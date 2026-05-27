@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - LunarVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --moon-cream: #F5D5E0;
+            --moon-lavender: #6667AB;
+            --moon-orchid: #7B337E;
+            --moon-plum: #420D4B;
+            --moon-deep: #210635;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== LOGO LOADER (shown on signup click) ===== */
+        .logo-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--moon-deep) 0%, var(--moon-plum) 100%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease;
+        }
+        .logo-loader.active { display: flex; }
+        .logo-loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        .loader-logo {
+            width: 120px;
+            height: 120px;
+            animation: loaderPulse 1.5s ease-in-out infinite;
+        }
+        .loader-logo svg { width: 100%; height: 100%; }
+        @keyframes loaderPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(102, 103, 171, 0.5)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 40px rgba(245, 213, 224, 0.8)); }
+        }
+        .loader-text {
+            margin-top: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            animation: loaderFade 1.5s ease-in-out infinite;
+        }
+        .loader-text span { color: var(--moon-lavender); }
+        @keyframes loaderFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .loader-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.6;
+        }
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(245, 213, 224, 0.2);
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+        .loader-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--moon-lavender), var(--moon-cream));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* ===== MAIN STYLES ===== */
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--moon-deep) 0%, var(--moon-plum) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--moon-cream);
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+        }
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+        }
+        .orb-1 { width: 400px; height: 400px; background: var(--moon-lavender); top: -10%; right: -10%; opacity: 0.3; }
+        .orb-2 { width: 300px; height: 300px; background: var(--moon-orchid); bottom: -10%; left: -10%; opacity: 0.25; }
+        
+        .signup-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(245, 213, 224, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 520px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.6s ease-out;
+            margin: 2rem 1rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 2rem;
+            text-decoration: none;
+        }
+        .logo-icon { width: 48px; height: 48px; }
+        .logo-icon svg { width: 100%; height: 100%; }
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--moon-cream);
+        }
+        .logo-text span { color: var(--moon-lavender); }
+        
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.6;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-group { margin-bottom: 1.2rem; }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        input {
+            width: 100%;
+            padding: 0.9rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(245, 213, 224, 0.2);
+            border-radius: 12px;
+            color: var(--moon-cream);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--moon-lavender);
+            box-shadow: 0 0 0 3px rgba(102, 103, 171, 0.2);
+        }
+        input::placeholder { color: rgba(245, 213, 224, 0.4); }
+
+        /* ===== SEARCHABLE DROPDOWN ===== */
+        .custom-select { position: relative; width: 100%; }
+        .select-trigger {
+            width: 100%;
+            padding: 0.9rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(245, 213, 224, 0.2);
+            border-radius: 12px;
+            color: var(--moon-cream);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .select-trigger:hover, .select-trigger.active {
+            border-color: var(--moon-lavender);
+            box-shadow: 0 0 0 3px rgba(102, 103, 171, 0.2);
+        }
+        .select-trigger .placeholder { opacity: 0.5; }
+        .select-trigger .arrow { transition: transform 0.3s ease; font-size: 0.8rem; }
+        .select-trigger.active .arrow { transform: rotate(180deg); }
+        
+        .dropdown-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            width: 100%;
+            max-height: 320px;
+            background: var(--moon-deep);
+            border: 1px solid rgba(245, 213, 224, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        .dropdown-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .search-box {
+            padding: 0.8rem;
+            border-bottom: 1px solid rgba(245, 213, 224, 0.1);
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(245, 213, 224, 0.15);
+            border-radius: 8px;
+            color: var(--moon-cream);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+        }
+        .search-box input:focus { outline: none; border-color: var(--moon-lavender); }
+        .search-box input::placeholder { color: rgba(245, 213, 224, 0.4); }
+        
+        .options-list {
+            max-height: 220px;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+        }
+        .options-list::-webkit-scrollbar { width: 6px; }
+        .options-list::-webkit-scrollbar-track { background: transparent; }
+        .options-list::-webkit-scrollbar-thumb { background: var(--moon-lavender); border-radius: 10px; }
+        .option {
+            padding: 0.7rem 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+        }
+        .option:hover { background: rgba(102, 103, 171, 0.2); }
+        .option.selected { background: rgba(102, 103, 171, 0.3); }
+        .option .flag { font-size: 1.2rem; }
+        .divider-text {
+            padding: 0.5rem 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            border-top: 1px solid rgba(245, 213, 224, 0.1);
+            margin-top: 0.5rem;
+        }
+        .no-results {
+            padding: 1.5rem;
+            text-align: center;
+            opacity: 0.5;
+            font-size: 0.9rem;
+        }
+        
+        .terms {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+        .terms input { width: auto; margin-top: 0.2rem; accent-color: var(--moon-lavender); }
+        .terms a { color: var(--moon-lavender); text-decoration: none; }
+        .terms a:hover { text-decoration: underline; }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            border: none;
+            border-radius: 12px;
+            color: var(--moon-cream);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(102, 103, 171, 0.4); }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        .btn:hover::before { left: 100%; }
+        .btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            opacity: 0.4;
+            font-size: 0.85rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(245, 213, 224, 0.3);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .login-link a { color: var(--moon-lavender); text-decoration: none; font-weight: 600; }
+        .login-link a:hover { text-decoration: underline; }
+        
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: var(--moon-cream);
+            text-decoration: none;
+            opacity: 0.6;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .back-link:hover { opacity: 1; }
+        
+        @media (max-width: 480px) {
+            .form-row { grid-template-columns: 1fr; }
+            .signup-container { padding: 2rem 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo Loader -->
+    <div class="logo-loader" id="loader">
+        <div class="loader-logo">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="loaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#F5D5E0"/>
+                        <stop offset="50%" style="stop-color:#6667AB"/>
+                        <stop offset="100%" style="stop-color:#7B337E"/>
+                    </linearGradient>
+                    <linearGradient id="vaultLoader" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6667AB"/>
+                        <stop offset="100%" style="stop-color:#F5D5E0"/>
+                    </linearGradient>
+                </defs>
+                <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#loaderGrad)" opacity="0.9"/>
+                <circle cx="24" cy="24" r="10" fill="none" stroke="url(#vaultLoader)" stroke-width="2" opacity="0.8"/>
+                <circle cx="24" cy="24" r="3" fill="#F5D5E0" opacity="0.9"/>
+                <circle cx="24" cy="8" r="2" fill="#F5D5E0" opacity="0.9">
+                    <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="3s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+        </div>
+        <div class="loader-text">Lunar<span>Vault</span></div>
+        <div class="loader-status" id="loaderStatus">Creating your account...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar" id="loaderBar"></div>
+        </div>
+    </div>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    
+    <div class="signup-container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <a href="index.html" class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#F5D5E0"/>
+                            <stop offset="50%" style="stop-color:#6667AB"/>
+                            <stop offset="100%" style="stop-color:#7B337E"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#moonGrad)"/>
+                    <circle cx="24" cy="24" r="10" fill="none" stroke="#6667AB" stroke-width="2" opacity="0.8"/>
+                    <circle cx="24" cy="24" r="3" fill="#F5D5E0"/>
+                    <circle cx="24" cy="8" r="2" fill="#F5D5E0">
+                        <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="8s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+            <div class="logo-text">Lunar<span>Vault</span></div>
+        </a>
+        
+        <h2>Create Your Account</h2>
+        <p class="subtitle">Join the future of digital banking in under 3 minutes</p>
+        
+        <form id="signupForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input type="text" id="firstName" placeholder="John" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input type="text" id="lastName" placeholder="Doe" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="+1 (555) 000-0000" required>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dob">Date of Birth</label>
+                    <input type="date" id="dob" required>
+                </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <div class="custom-select" id="countrySelect">
+                        <div class="select-trigger" onclick="toggleDropdown()">
+                            <span class="placeholder" id="selectedCountry">Select your country...</span>
+                            <span class="arrow">▼</span>
+                        </div>
+                        <div class="dropdown-menu" id="dropdownMenu">
+                            <div class="search-box">
+                                <input type="text" id="countrySearch" placeholder="Search countries..." oninput="filterCountries()" onclick="event.stopPropagation()">
+                            </div>
+                            <div class="options-list" id="optionsList"></div>
+                        </div>
+                    </div>
+                    <input type="hidden" id="country" name="country" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Create Password</label>
+                <input type="password" id="password" placeholder="Min 8 characters" required minlength="8">
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Repeat password" required>
+            </div>
+            <label class="terms">
+                <input type="checkbox" required>
+                <span>I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>. I confirm I am at least 18 years old.</span>
+            </label>
+            <button type="submit" class="btn" id="signupBtn">Create Account</button>
+        </form>
+        
+        <div class="divider">or</div>
+        
+        <p class="login-link">
+            Already have an account? <a href="login.html">Sign In</a>
+        </p>
+    </div>
+
+       <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ===== SUPABASE CONFIG =====
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_KEY = 'your-anon-key';
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ===== COUNTRIES DATA =====
+        const majorCountries = [
+            { code: 'US', name: 'United States', flag: '🇺🇸' },
+            { code: 'GB', name: 'United Kingdom', flag: '🇬🇧' },
+            { code: 'CA', name: 'Canada', flag: '🇨🇦' },
+            { code: 'AU', name: 'Australia', flag: '🇦🇺' },
+            { code: 'DE', name: 'Germany', flag: '🇩🇪' },
+            { code: 'FR', name: 'France', flag: '🇫🇷' },
+            { code: 'JP', name: 'Japan', flag: '🇯🇵' },
+            { code: 'CN', name: 'China', flag: '🇨🇳' },
+            { code: 'IN', name: 'India', flag: '🇮🇳' },
+            { code: 'BR', name: 'Brazil', flag: '🇧🇷' },
+            { code: 'NG', name: 'Nigeria', flag: '🇳🇬' },
+            { code: 'ZA', name: 'South Africa', flag: '🇿🇦' },
+            { code: 'GH', name: 'Ghana', flag: '🇬🇭' },
+            { code: 'BB', name: 'Barbados', flag: '🇧🇧' },
+            { code: 'JM', name: 'Jamaica', flag: '🇯🇲' },
+            { code: 'MX', name: 'Mexico', flag: '🇲🇽' },
+            { code: 'IT', name: 'Italy', flag: '🇮🇹' },
+            { code: 'ES', name: 'Spain', flag: '🇪🇸' },
+            { code: 'RU', name: 'Russia', flag: '🇷🇺' },
+            { code: 'KR', name: 'South Korea', flag: '🇰🇷' }
+        ];
+
+        // THIS WAS MISSING - Add the otherCountries array
+        const otherCountries = [
+            { code: 'AF', name: 'Afghanistan', flag: '🇦🇫' },
+            { code: 'AL', name: 'Albania', flag: '🇦🇱' },
+            { code: 'DZ', name: 'Algeria', flag: '🇩🇿' },
+            { code: 'AD', name: 'Andorra', flag: '🇦🇩' },
+            { code: 'AO', name: 'Angola', flag: '🇦🇴' },
+            { code: 'AR', name: 'Argentina', flag: '🇦🇷' },
+            { code: 'AM', name: 'Armenia', flag: '🇦🇲' },
+            { code: 'AT', name: 'Austria', flag: '🇦🇹' },
+            { code: 'AZ', name: 'Azerbaijan', flag: '🇦🇿' },
+            { code: 'BS', name: 'Bahamas', flag: '🇧🇸' },
+            { code: 'BH', name: 'Bahrain', flag: '🇧🇭' },
+            { code: 'BD', name: 'Bangladesh', flag: '🇧🇩' },
+            { code: 'BY', name: 'Belarus', flag: '🇧🇾' },
+            { code: 'BE', name: 'Belgium', flag: '🇧🇪' },
+            { code: 'BZ', name: 'Belize', flag: '🇧🇿' },
+            { code: 'BJ', name: 'Benin', flag: '🇧🇯' },
+            { code: 'BT', name: 'Bhutan', flag: '🇧🇹' },
+            { code: 'BO', name: 'Bolivia', flag: '🇧🇴' },
+            { code: 'BA', name: 'Bosnia', flag: '🇧🇦' },
+            { code: 'BW', name: 'Botswana', flag: '🇧🇼' },
+            { code: 'BN', name: 'Brunei', flag: '🇧🇳' },
+            { code: 'BG', name: 'Bulgaria', flag: '🇧🇬' },
+            { code: 'BF', name: 'Burkina Faso', flag: '🇧🇫' },
+            { code: 'BI', name: 'Burundi', flag: '🇧🇮' },
+            { code: 'KH', name: 'Cambodia', flag: '🇰🇭' },
+            { code: 'CM', name: 'Cameroon', flag: '🇨🇲' },
+            { code: 'CV', name: 'Cape Verde', flag: '🇨🇻' },
+            { code: 'CF', name: 'Central African Republic', flag: '🇨🇫' },
+            { code: 'TD', name: 'Chad', flag: '🇹🇩' },
+            { code: 'CL', name: 'Chile', flag: '🇨🇱' },
+            { code: 'CO', name: 'Colombia', flag: '🇨🇴' },
+            { code: 'KM', name: 'Comoros', flag: '🇰🇲' },
+            { code: 'CG', name: 'Congo', flag: '🇨🇬' },
+            { code: 'CD', name: 'Congo DRC', flag: '🇨🇩' },
+            { code: 'CR', name: 'Costa Rica', flag: '🇨🇷' },
+            { code: 'CI', name: "Côte d'Ivoire", flag: '🇨🇮' },
+            { code: 'HR', name: 'Croatia', flag: '🇭🇷' },
+            { code: 'CU', name: 'Cuba', flag: '🇨🇺' },
+            { code: 'CY', name: 'Cyprus', flag: '🇨🇾' },
+            { code: 'CZ', name: 'Czech Republic', flag: '🇨🇿' },
+            { code: 'DK', name: 'Denmark', flag: '🇩🇰' },
+            { code: 'DJ', name: 'Djibouti', flag: '🇩🇯' },
+            { code: 'DM', name: 'Dominica', flag: '🇩🇲' },
+            { code: 'DO', name: 'Dominican Republic', flag: '🇩🇴' },
+            { code: 'EC', name: 'Ecuador', flag: '🇪🇨' },
+            { code: 'EG', name: 'Egypt', flag: '🇪🇬' },
+            { code: 'SV', name: 'El Salvador', flag: '🇸🇻' },
+            { code: 'GQ', name: 'Equatorial Guinea', flag: '🇬🇶' },
+            { code: 'ER', name: 'Eritrea', flag: '🇪🇷' },
+            { code: 'EE', name: 'Estonia', flag: '🇪🇪' },
+            { code: 'SZ', name: 'Eswatini', flag: '🇸🇿' },
+            { code: 'ET', name: 'Ethiopia', flag: '🇪🇹' },
+            { code: 'FJ', name: 'Fiji', flag: '🇫🇯' },
+            { code: 'FI', name: 'Finland', flag: '🇫🇮' },
+            { code: 'GA', name: 'Gabon', flag: '🇬🇦' },
+            { code: 'GM', name: 'Gambia', flag: '🇬🇲' },
+            { code: 'GE', name: 'Georgia', flag: '🇬🇪' },
+            { code: 'GR', name: 'Greece', flag: '🇬🇷' },
+            { code: 'GL', name: 'Greenland', flag: '🇬🇱' },
+            { code: 'GD', name: 'Grenada', flag: '🇬🇩' },
+            { code: 'GT', name: 'Guatemala', flag: '🇬🇹' },
+            { code: 'GN', name: 'Guinea', flag: '🇬🇳' },
+            { code: 'GW', name: 'Guinea-Bissau', flag: '🇬🇼' },
+            { code: 'GY', name: 'Guyana', flag: '🇬🇾' },
+            { code: 'HT', name: 'Haiti', flag: '🇭🇹' },
+            { code: 'HN', name: 'Honduras', flag: '🇭🇳' },
+            { code: 'HK', name: 'Hong Kong', flag: '🇭🇰' },
+            { code: 'HU', name: 'Hungary', flag: '🇭🇺' },
+            { code: 'IS', name: 'Iceland', flag: '🇮🇸' },
+            { code: 'ID', name: 'Indonesia', flag: '🇮🇩' },
+            { code: 'IR', name: 'Iran', flag: '🇮🇷' },
+            { code: 'IQ', name: 'Iraq', flag: '🇮🇶' },
+            { code: 'IE', name: 'Ireland', flag: '🇮🇪' },
+            { code: 'IL', name: 'Israel', flag: '🇮🇱' },
+            { code: 'JO', name: 'Jordan', flag: '🇯🇴' },
+            { code: 'KZ', name: 'Kazakhstan', flag: '🇰🇿' },
+            { code: 'KE', name: 'Kenya', flag: '🇰🇪' },
+            { code: 'KI', name: 'Kiribati', flag: '🇰🇮' },
+            { code: 'KW', name: 'Kuwait', flag: '🇰🇼' },
+            { code: 'KG', name: 'Kyrgyzstan', flag: '🇰🇬' },
+            { code: 'LA', name: 'Laos', flag: '🇱🇦' },
+            { code: 'LV', name: 'Latvia', flag: '🇱🇻' },
+            { code: 'LB', name: 'Lebanon', flag: '🇱🇧' },
+            { code: 'LS', name: 'Lesotho', flag: '🇱🇸' },
+            { code: 'LR', name: 'Liberia', flag: '🇱🇷' },
+            { code: 'LY', name: 'Libya', flag: '🇱🇾' },
+            { code: 'LI', name: 'Liechtenstein', flag: '🇱🇮' },
+            { code: 'LT', name: 'Lithuania', flag: '🇱🇹' },
+            { code: 'LU', name: 'Luxembourg', flag: '🇱🇺' },
+            { code: 'MG', name: 'Madagascar', flag: '🇲🇬' },
+            { code: 'MW', name: 'Malawi', flag: '🇲🇼' },
+            { code: 'MY', name: 'Malaysia', flag: '🇲🇾' },
+            { code: 'MV', name: 'Maldives', flag: '🇲🇻' },
+            { code: 'ML', name: 'Mali', flag: '🇲🇱' },
+            { code: 'MT', name: 'Malta', flag: '🇲🇹' },
+            { code: 'MH', name: 'Marshall Islands', flag: '🇲🇭' },
+            { code: 'MR', name: 'Mauritania', flag: '🇲🇷' },
+            { code: 'MU', name: 'Mauritius', flag: '🇲🇺' },
+            { code: 'FM', name: 'Micronesia', flag: '🇫🇲' },
+            { code: 'MD', name: 'Moldova', flag: '🇲🇩' },
+            { code: 'MC', name: 'Monaco', flag: '🇲🇨' },
+            { code: 'MN', name: 'Mongolia', flag: '🇲🇳' },
+            { code: 'ME', name: 'Montenegro', flag: '🇲🇪' },
+            { code: 'MA', name: 'Morocco', flag: '🇲🇦' },
+            { code: 'MZ', name: 'Mozambique', flag: '🇲🇿' },
+            { code: 'MM', name: 'Myanmar', flag: '🇲🇲' },
+            { code: 'NA', name: 'Namibia', flag: '🇳🇦' },
+            { code: 'NR', name: 'Nauru', flag: '🇳🇷' },
+            { code: 'NP', name: 'Nepal', flag: '🇳🇵' },
+            { code: 'NL', name: 'Netherlands', flag: '🇳🇱' },
+            { code: 'NZ', name: 'New Zealand', flag: '🇳🇿' },
+            { code: 'NI', name: 'Nicaragua', flag: '🇳🇮' },
+            { code: 'NE', name: 'Niger', flag: '🇳🇪' },
+            { code: 'KP', name: 'North Korea', flag: '🇰🇵' },
+            { code: 'MK', name: 'North Macedonia', flag: '🇲🇰' },
+            { code: 'NO', name: 'Norway', flag: '🇳🇴' },
+            { code: 'OM', name: 'Oman', flag: '🇴🇲' },
+            { code: 'PK', name: 'Pakistan', flag: '🇵🇰' },
+            { code: 'PW', name: 'Palau', flag: '🇵🇼' },
+            { code: 'PA', name: 'Panama', flag: '🇵🇦' },
+            { code: 'PG', name: 'Papua New Guinea', flag: '🇵🇬' },
+            { code: 'PY', name: 'Paraguay', flag: '🇵🇾' },
+            { code: 'PE', name: 'Peru', flag: '🇵🇪' },
+            { code: 'PH', name: 'Philippines', flag: '🇵🇭' },
+            { code: 'PL', name: 'Poland', flag: '🇵🇱' },
+            { code: 'PT', name: 'Portugal', flag: '🇵🇹' },
+            { code: 'QA', name: 'Qatar', flag: '🇶🇦' },
+            { code: 'RO', name: 'Romania', flag: '🇷🇴' },
+            { code: 'RW', name: 'Rwanda', flag: '🇷🇼' },
+            { code: 'KN', name: 'Saint Kitts', flag: '🇰🇳' },
+            { code: 'LC', name: 'Saint Lucia', flag: '🇱🇨' },
+            { code: 'VC', name: 'Saint Vincent', flag: '🇻🇨' },
+            { code: 'WS', name: 'Samoa', flag: '🇼🇸' },
+            { code: 'SM', name: 'San Marino', flag: '🇸🇲' },
+            { code: 'ST', name: 'São Tomé', flag: '🇸🇹' },
+            { code: 'SA', name: 'Saudi Arabia', flag: '🇸🇦' },
+            { code: 'SN', name: 'Senegal', flag: '🇸🇳' },
+            { code: 'RS', name: 'Serbia', flag: '🇷🇸' },
+            { code: 'SC', name: 'Seychelles', flag: '🇸🇨' },
+            { code: 'SL', name: 'Sierra Leone', flag: '🇸🇱' },
+            { code: 'SG', name: 'Singapore', flag: '🇸🇬' },
+            { code: 'SK', name: 'Slovakia', flag: '🇸🇰' },
+            { code: 'SI', name: 'Slovenia', flag: '🇸🇮' },
+            { code: 'SB', name: 'Solomon Islands', flag: '🇸🇧' },
+            { code: 'SO', name: 'Somalia', flag: '🇸🇴' },
+            { code: 'SS', name: 'South Sudan', flag: '🇸🇸' },
+            { code: 'LK', name: 'Sri Lanka', flag: '🇱🇰' },
+            { code: 'SD', name: 'Sudan', flag: '🇸🇩' },
+            { code: 'SR', name: 'Suriname', flag: '🇸🇷' },
+            { code: 'SE', name: 'Sweden', flag: '🇸🇪' },
+            { code: 'CH', name: 'Switzerland', flag: '🇨🇭' },
+            { code: 'SY', name: 'Syria', flag: '🇸🇾' },
+            { code: 'TJ', name: 'Tajikistan', flag: '🇹🇯' },
+            { code: 'TZ', name: 'Tanzania', flag: '🇹🇿' },
+            { code: 'TH', name: 'Thailand', flag: '🇹🇭' },
+            { code: 'TL', name: 'Timor-Leste', flag: '🇹🇱' },
+            { code: 'TG', name: 'Togo', flag: '🇹🇬' },
+            { code: 'TO', name: 'Tonga', flag: '🇹🇴' },
+            { code: 'TT', name: 'Trinidad and Tobago', flag: '🇹🇹' },
+            { code: 'TN', name: 'Tunisia', flag: '🇹🇳' },
+            { code: 'TR', name: 'Turkey', flag: '🇹🇷' },
+            { code: 'TM', name: 'Turkmenistan', flag: '🇹🇲' },
+            { code: 'TV', name: 'Tuvalu', flag: '🇹🇻' },
+            { code: 'UG', name: 'Uganda', flag: '🇺🇬' },
+            { code: 'UA', name: 'Ukraine', flag: '🇺🇦' },
+            { code: 'AE', name: 'United Arab Emirates', flag: '🇦🇪' },
+            { code: 'UY', name: 'Uruguay', flag: '🇺🇾' },
+            { code: 'UZ', name: 'Uzbekistan', flag: '🇺🇿' },
+            { code: 'VU', name: 'Vanuatu', flag: '🇻🇺' },
+            { code: 'VA', name: 'Vatican City', flag: '🇻🇦' },
+            { code: 'VE', name: 'Venezuela', flag: '🇻🇪' },
+            { code: 'VN', name: 'Vietnam', flag: '🇻🇳' },
+            { code: 'YE', name: 'Yemen', flag: '🇾🇪' },
+            { code: 'ZM', name: 'Zambia', flag: '🇿🇲' },
+            { code: 'ZW', name: 'Zimbabwe', flag: '🇿🇼' }
+        ];
+
+        // Combine all countries
+        const allCountries = [...majorCountries, ...otherCountries];
+        let selectedCountry = null;
+        let isDropdownOpen = false;
+
+        // Initialize dropdown
+        function initDropdown() {
+            renderOptions(allCountries);
+        }
+
+        function renderOptions(countriesToRender, showDividers = true) {
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+
+            if (countriesToRender.length === 0) {
+                optionsList.innerHTML = '<div class="no-results">No countries found</div>';
+                return;
+            }
+
+            if (showDividers && countriesToRender === allCountries) {
+                // Render major countries first
+                majorCountries.forEach(country => {
+                    const option = createOption(country);
+                    optionsList.appendChild(option);
+                });
+
+                // Add divider
+                const divider = document.createElement('div');
+                divider.className = 'divider-text';
+                divider.textContent = 'More Countries';
+                optionsList.appendChild(divider);
+
+                // Render other countries
+                otherCountries.forEach(country => {
+                    const option = createOption(country);
+                    optionsList.appendChild(option);
+                });
+            } else {
+                // Render filtered results without dividers
+                countriesToRender.forEach(country => {
+                    const option = createOption(country);
+                    optionsList.appendChild(option);
+                });
+            }
+        }
+
+        function createOption(country) {
+            const option = document.createElement('div');
+            option.className = 'option';
+            if (selectedCountry && selectedCountry.code === country.code) {
+                option.classList.add('selected');
+            }
+            option.innerHTML = `<span class="flag">${country.flag}</span><span>${country.name}</span>`;
+            option.onclick = () => selectCountry(country);
+            return option;
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.getElementById('dropdownMenu');
+            const trigger = document.querySelector('.select-trigger');
+            
+            isDropdownOpen = !isDropdownOpen;
+            
+            if (isDropdownOpen) {
+                dropdown.classList.add('open');
+                trigger.classList.add('active');
+                document.getElementById('countrySearch').focus();
+            } else {
+                dropdown.classList.remove('open');
+                trigger.classList.remove('active');
+            }
+        }
+
+        function filterCountries() {
+            const searchTerm = document.getElementById('countrySearch').value.toLowerCase();
+            const filtered = allCountries.filter(c => 
+                c.name.toLowerCase().includes(searchTerm)
+            );
+            renderOptions(filtered, false);
+        }
+
+        function selectCountry(country) {
+            selectedCountry = country;
+            document.getElementById('selectedCountry').textContent = `${country.flag} ${country.name}`;
+            document.getElementById('selectedCountry').classList.remove('placeholder');
+            document.getElementById('country').value = country.code;
+            toggleDropdown();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            const select = document.getElementById('countrySelect');
+            if (!select.contains(e.target) && isDropdownOpen) {
+                toggleDropdown();
+            }
+        });
+
+        // ===== LOADER FUNCTIONS =====
+        const loader = document.getElementById('loader');
+        const loaderBar = document.getElementById('loaderBar');
+        const loaderStatus = document.getElementById('loaderStatus');
+        const signupBtn = document.getElementById('signupBtn');
+
+        function showLoader() {
+            loader.classList.add('active');
+            setTimeout(() => { loaderBar.style.width = '30%'; }, 100);
+            setTimeout(() => { loaderBar.style.width = '60%'; loaderStatus.textContent = 'Verifying details...'; }, 800);
+            setTimeout(() => { loaderBar.style.width = '90%'; loaderStatus.textContent = 'Setting up account...'; }, 1600);
+        }
+
+        function hideLoader() {
+            loaderBar.style.width = '100%';
+            setTimeout(() => {
+                loader.classList.remove('active');
+                loader.classList.add('hidden');
+            }, 400);
+        }
+
+        // ===== SUPABASE SIGNUP =====
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const dob = document.getElementById('dob').value;
+            const countryCode = document.getElementById('country').value;
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            
+            if (!countryCode) {
+                alert('Please select a country');
+                return;
+            }
+            
+            if (password !== confirm) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            // Disable button and show loader
+            signupBtn.disabled = true;
+            signupBtn.textContent = 'Creating account...';
+            showLoader();
+            
+            try {
+                // Sign up with Supabase Auth
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: {
+                        data: {
+                            first_name: firstName,
+                            last_name: lastName,
+                            phone: phone,
+                            dob: dob,
+                            country: countryCode
+                        }
+                    }
+                });
+                
+                if (authError) throw authError;
+                
+                // Insert additional user data into profiles table
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: authData.user.id,
+                            first_name: firstName,
+                            last_name: lastName,
+                            email: email,
+                            phone: phone,
+                            dob: dob,
+                            country: countryCode,
+                            created_at: new Date().toISOString()
+                        }
+                    ]);
+                
+                if (profileError) throw profileError;
+                
+                // Success
+                hideLoader();
+                alert('Account created! Check your email to verify.');
+                window.location.href = 'login.html';
+                
+            } catch (error) {
+                hideLoader();
+                signupBtn.disabled = false;
+                signupBtn.textContent = 'Create Account';
+                alert('Error: ' + error.message);
+            }
+        });
+
+        // Initialize
+        initDropdown();
+    </script>
+</body>
+</html>

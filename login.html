@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - LunarVault</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --moon-cream: #F5D5E0;
+            --moon-lavender: #6667AB;
+            --moon-orchid: #7B337E;
+            --moon-plum: #420D4B;
+            --moon-deep: #210635;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* ===== SPLASH SCREEN / LOADER ===== */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--moon-deep) 0%, var(--moon-plum) 100%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .splash-screen.active {
+            display: flex;
+            opacity: 1;
+            visibility: visible;
+        }
+        .splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        .splash-logo {
+            width: 120px;
+            height: 120px;
+            animation: splashPulse 1.5s ease-in-out infinite;
+        }
+        .splash-logo svg { width: 100%; height: 100%; }
+        @keyframes splashPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(102, 103, 171, 0.5)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 40px rgba(245, 213, 224, 0.8)); }
+        }
+        .splash-text {
+            margin-top: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 3px;
+            animation: splashFade 1.5s ease-in-out infinite;
+        }
+        .splash-text span { color: var(--moon-lavender); }
+        @keyframes splashFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .splash-status {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            opacity: 0.6;
+            animation: splashFade 2s ease-in-out infinite;
+        }
+        .splash-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(245, 213, 224, 0.2);
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+        .splash-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--moon-lavender), var(--moon-cream));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        /* ===== MAIN STYLES ===== */
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--moon-deep) 0%, var(--moon-plum) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--moon-cream);
+            overflow-x: hidden;
+        }
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+        }
+        .orb-1 { width: 400px; height: 400px; background: var(--moon-lavender); top: -10%; right: -10%; opacity: 0.3; }
+        .orb-2 { width: 300px; height: 300px; background: var(--moon-orchid); bottom: -10%; left: -10%; opacity: 0.25; }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(245, 213, 224, 0.1);
+            border-radius: 24px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            backdrop-filter: blur(20px);
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 0.6s ease-out;
+            margin: 2rem 1rem;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 2rem;
+            text-decoration: none;
+        }
+        .logo-icon { width: 48px; height: 48px; }
+        .logo-icon svg { width: 100%; height: 100%; }
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--moon-cream);
+        }
+        .logo-text span { color: var(--moon-lavender); }
+        
+        h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+        .subtitle {
+            text-align: center;
+            opacity: 0.6;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .form-group { margin-bottom: 1.5rem; }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+        input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(245, 213, 224, 0.2);
+            border-radius: 12px;
+            color: var(--moon-cream);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: var(--moon-lavender);
+            box-shadow: 0 0 0 3px rgba(102, 103, 171, 0.2);
+        }
+        input::placeholder { color: rgba(245, 213, 224, 0.4); }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.85rem;
+        }
+        .remember {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
+        .remember input[type="checkbox"] {
+            width: auto;
+            accent-color: var(--moon-lavender);
+        }
+        .forgot {
+            color: var(--moon-lavender);
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+        .forgot:hover { opacity: 0.8; }
+        
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            border: none;
+            border-radius: 12px;
+            color: var(--moon-cream);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(102, 103, 171, 0.4);
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+        .btn:hover::before { left: 100%; }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            opacity: 0.4;
+            font-size: 0.85rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(245, 213, 224, 0.3);
+        }
+        .signup-link {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        .signup-link a {
+            color: var(--moon-lavender);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .signup-link a:hover { text-decoration: underline; }
+        
+        .back-link {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: var(--moon-cream);
+            text-decoration: none;
+            opacity: 0.6;
+            font-size: 0.9rem;
+            transition: opacity 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .back-link:hover { opacity: 1; }
+    </style>
+</head>
+<body>
+    <!-- Logo Loader (hidden by default, shown on login click) -->
+    <div class="splash-screen" id="loader">
+        <div class="splash-logo">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="loaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#F5D5E0"/>
+                        <stop offset="50%" style="stop-color:#6667AB"/>
+                        <stop offset="100%" style="stop-color:#7B337E"/>
+                    </linearGradient>
+                    <linearGradient id="vaultLoader" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6667AB"/>
+                        <stop offset="100%" style="stop-color:#F5D5E0"/>
+                    </linearGradient>
+                </defs>
+                <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#loaderGrad)" opacity="0.9"/>
+                <circle cx="24" cy="24" r="10" fill="none" stroke="url(#vaultLoader)" stroke-width="2" opacity="0.8"/>
+                <circle cx="24" cy="24" r="3" fill="#F5D5E0" opacity="0.9"/>
+                <circle cx="24" cy="8" r="2" fill="#F5D5E0" opacity="0.9">
+                    <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="3s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+        </div>
+        <div class="splash-text">Lunar<span>Vault</span></div>
+        <div class="splash-status" id="loaderStatus">Authenticating...</div>
+        <div class="splash-progress">
+            <div class="splash-progress-bar" id="loaderBar"></div>
+        </div>
+    </div>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    
+    <div class="login-container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <a href="index.html" class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#F5D5E0"/>
+                            <stop offset="50%" style="stop-color:#6667AB"/>
+                            <stop offset="100%" style="stop-color:#7B337E"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#moonGrad)"/>
+                    <circle cx="24" cy="24" r="10" fill="none" stroke="#6667AB" stroke-width="2" opacity="0.8"/>
+                    <circle cx="24" cy="24" r="3" fill="#F5D5E0"/>
+                    <circle cx="24" cy="8" r="2" fill="#F5D5E0">
+                        <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="8s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+            <div class="logo-text">Lunar<span>Vault</span></div>
+        </a>
+        
+        <h2>Welcome Back</h2>
+        <p class="subtitle">Enter your credentials to access your account</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="you@example.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <div class="options">
+                <label class="remember">
+                    <input type="checkbox" checked>
+                    Remember me
+                </label>
+                <a href="#" class="forgot">Forgot password?</a>
+            </div>
+            <button type="submit" class="btn" id="loginBtn">Sign In</button>
+        </form>
+        
+        <div class="divider">or</div>
+        
+        <p class="signup-link">
+            Don't have an account? <a href="signup.html">Open Account</a>
+        </p>
+    </div>
+
+    <script>
+        const loader = document.getElementById('loader');
+        const loaderBar = document.getElementById('loaderBar');
+        const loaderStatus = document.getElementById('loaderStatus');
+        const loginBtn = document.getElementById('loginBtn');
+
+        function showLoader() {
+            loader.classList.add('active');
+            // Animate progress bar
+            setTimeout(() => { loaderBar.style.width = '30%'; }, 100);
+            setTimeout(() => { loaderBar.style.width = '60%'; loaderStatus.textContent = 'Verifying credentials...'; }, 800);
+            setTimeout(() => { loaderBar.style.width = '90%'; loaderStatus.textContent = 'Loading dashboard...'; }, 1600);
+        }
+
+        function hideLoader() {
+            loaderBar.style.width = '100%';
+            setTimeout(() => {
+                loader.classList.remove('active');
+                loader.classList.add('hidden');
+            }, 400);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) return;
+            
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            
+            // Show logo loader
+            showLoader();
+            
+            // Simulate login process (replace with your actual auth logic)
+            setTimeout(() => {
+                hideLoader();
+                // Redirect to dashboard after loader finishes
+                // window.location.href = 'dashboard.html';
+                alert('Login successful! Redirecting to dashboard...');
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
+            }, 2500);
+        });
+    </script>
+</body>
+</html>

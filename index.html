@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LunarVault - Online Banking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --moon-cream: #F5D5E0;
+            --moon-lavender: #6667AB;
+            --moon-orchid: #7B337E;
+            --moon-plum: #420D4B;
+            --moon-deep: #210635;
+            --moon-glow: rgba(245, 213, 224, 0.15);
+            --moon-shine: rgba(102, 103, 171, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--moon-deep);
+            min-height: 100vh;
+            color: var(--moon-cream);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ===== LOADER ===== */
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--moon-deep) 0%, var(--moon-plum) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .loader-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .loader-logo {
+            width: 120px;
+            height: 120px;
+            position: relative;
+        }
+
+        .loader-logo svg {
+            width: 100%;
+            height: 100%;
+            animation: loaderPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 20px rgba(102, 103, 171, 0.5)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 40px rgba(245, 213, 224, 0.8)); }
+        }
+
+        .loader-text {
+            margin-top: 2rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: 4px;
+            animation: loaderFade 1.5s ease-in-out infinite;
+        }
+
+        .loader-text span {
+            color: var(--moon-lavender);
+        }
+
+        @keyframes loaderFade {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        .loader-progress {
+            width: 200px;
+            height: 3px;
+            background: rgba(245, 213, 224, 0.2);
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            overflow: hidden;
+        }
+
+        .loader-progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--moon-lavender), var(--moon-cream));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            animation: progressLoad 2.5s ease-out forwards;
+        }
+
+        @keyframes progressLoad {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        /* ===== BACKGROUND EFFECTS ===== */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .star {
+            position: absolute;
+            background: var(--moon-cream);
+            border-radius: 50%;
+            animation: twinkle var(--duration) ease-in-out infinite;
+            opacity: 0;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: var(--opacity); transform: scale(1); }
+        }
+
+        .shooting-star {
+            position: absolute;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--moon-cream), transparent);
+            animation: shoot 3s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes shoot {
+            0% { transform: translateX(-100px) translateY(100px); opacity: 1; }
+            100% { transform: translateX(300px) translateY(-100px); opacity: 0; }
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s ease-in-out infinite;
+        }
+
+        .orb-1 {
+            width: 400px;
+            height: 400px;
+            background: var(--moon-lavender);
+            top: -10%;
+            right: -10%;
+            opacity: 0.3;
+            animation-delay: 0s;
+        }
+
+        .orb-2 {
+            width: 300px;
+            height: 300px;
+            background: var(--moon-orchid);
+            bottom: -5%;
+            left: -5%;
+            opacity: 0.25;
+            animation-delay: -10s;
+        }
+
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            background: var(--moon-cream);
+            top: 40%;
+            left: 30%;
+            opacity: 0.08;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        #particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(33, 6, 53, 0.6);
+            border-bottom: 1px solid rgba(245, 213, 224, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            padding: 0.8rem 5%;
+            background: rgba(33, 6, 53, 0.9);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            text-decoration: none;
+        }
+
+        .logo-container:hover {
+            transform: scale(1.05);
+        }
+
+        .logo-icon {
+            width: 42px;
+            height: 42px;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .logo-text {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--moon-cream);
+            letter-spacing: -0.5px;
+        }
+
+        .logo-text span {
+            color: var(--moon-lavender);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--moon-cream);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            opacity: 0.8;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--moon-lavender), var(--moon-cream));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            opacity: 1;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background: var(--moon-cream);
+            transition: all 0.3s ease;
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 120px 5% 80px;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, var(--moon-deep) 0%, var(--moon-plum) 50%, var(--moon-orchid) 100%);
+        }
+
+        .hero-content {
+            max-width: 650px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.6rem 1.2rem;
+            background: rgba(102, 103, 171, 0.2);
+            border: 1px solid rgba(102, 103, 171, 0.4);
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(102, 103, 171, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(102, 103, 171, 0.2); }
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--moon-lavender);
+            border-radius: 50%;
+            animation: blink 2s ease-in-out infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(3rem, 6vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            color: var(--moon-cream);
+        }
+
+        h1 .highlight {
+            background: linear-gradient(135deg, var(--moon-cream), var(--moon-lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            opacity: 0.85;
+            margin-bottom: 2.5rem;
+            max-width: 500px;
+            font-weight: 300;
+        }
+
+        .cta-group {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2.5rem;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            border: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            color: var(--moon-cream);
+            box-shadow: 0 4px 30px rgba(102, 103, 171, 0.4);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 40px rgba(102, 103, 171, 0.6);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--moon-cream);
+            border: 2px solid rgba(245, 213, 224, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--moon-cream);
+            background: rgba(245, 213, 224, 0.1);
+            transform: translateY(-3px);
+        }
+
+        .btn-arrow {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-primary:hover .btn-arrow {
+            transform: translateX(5px);
+        }
+
+        /* 3D Card */
+        .hero-visual {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 400px;
+            height: 500px;
+            perspective: 1000px;
+            z-index: 1;
+        }
+
+        .floating-card {
+            width: 320px;
+            height: 200px;
+            background: linear-gradient(135deg, rgba(102, 103, 171, 0.3), rgba(123, 51, 126, 0.3));
+            border: 1px solid rgba(245, 213, 224, 0.2);
+            border-radius: 20px;
+            position: absolute;
+            top: 30%;
+            left: 10%;
+            backdrop-filter: blur(20px);
+            transform-style: preserve-3d;
+            animation: cardFloat 6s ease-in-out infinite;
+            box-shadow: 0 20px 60px rgba(33, 6, 53, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .floating-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-cream), var(--moon-orchid));
+            border-radius: 22px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        @keyframes cardFloat {
+            0%, 100% { transform: translateY(0) rotateX(10deg) rotateY(-10deg); }
+            50% { transform: translateY(-20px) rotateX(15deg) rotateY(-5deg); }
+        }
+
+        .card-chip {
+            width: 50px;
+            height: 35px;
+            background: linear-gradient(135deg, #d4af37, #f4e5c2);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-chip::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .card-number {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            opacity: 0.9;
+        }
+
+        .card-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .card-holder {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .card-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Stats */
+        .stats {
+            position: absolute;
+            bottom: 8%;
+            left: 5%;
+            right: 5%;
+            display: flex;
+            gap: 3rem;
+            flex-wrap: wrap;
+            z-index: 1;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+            animation: fadeInUp 1s ease-out backwards;
+            margin-bottom: -5%;
+        }
+
+        .stat-item:nth-child(1) { animation-delay: 0.2s; }
+        .stat-item:nth-child(2) { animation-delay: 0.4s; }
+        .stat-item:nth-child(3) { animation-delay: 0.6s; }
+
+        .stat-number {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--moon-cream);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            font-weight: 500;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0.6;
+            animation: bounce 2s ease-in-out infinite;
+            z-index: 1;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        .scroll-text {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(to bottom, var(--moon-cream), transparent);
+        }
+
+        /* ===== FEATURES SECTION ===== */
+        .features {
+            padding: 100px 5%;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg, var(--moon-orchid) 0%, var(--moon-plum) 100%);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.5rem 1.2rem;
+            background: rgba(102, 103, 171, 0.2);
+            border: 1px solid rgba(102, 103, 171, 0.4);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--moon-lavender);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.7;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(245, 213, 224, 0.1);
+            border-radius: 24px;
+            padding: 2.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--moon-lavender), var(--moon-orchid));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(245, 213, 224, 0.2);
+            box-shadow: 0 20px 60px rgba(33, 6, 53, 0.4);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .feature-desc {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .how-it-works {
+            padding: 100px 5%;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg, var(--moon-plum) 0%, var(--moon-deep) 100%);
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            margin: 3rem auto 0;
+        }
+
+        .step-card {
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .step-number {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(102, 103, 171, 0.3);
+        }
+
+        .step-number::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--moon-cream);
+            opacity: 0.3;
+            animation: ripple 2s ease-out infinite;
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(1); opacity: 0.3; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+
+        .step-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+        .step-desc {
+            font-size: 0.95rem;
+            opacity: 0.7;
+            line-height: 1.7;
+        }
+
+        .step-connector {
+            position: absolute;
+            top: 40px;
+            right: -2rem;
+            width: 4rem;
+            height: 2px;
+            background: linear-gradient(90deg, var(--moon-lavender), transparent);
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .step-connector { display: none; }
+        }
+
+        /* ===== SECURITY SECTION ===== */
+        .security {
+            padding: 100px 5%;
+            position: relative;
+            z-index: 1;
+            background: var(--moon-deep);
+        }
+
+        .security-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .security-visual {
+            position: relative;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .shield-animation {
+            width: 200px;
+            height: 200px;
+            position: relative;
+        }
+
+        .shield-ring {
+            position: absolute;
+            border: 2px solid var(--moon-lavender);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: expandRing 3s ease-out infinite;
+        }
+
+        .shield-ring:nth-child(1) { width: 100%; height: 100%; animation-delay: 0s; }
+        .shield-ring:nth-child(2) { width: 140%; height: 140%; top: -20%; left: -20%; animation-delay: 1s; }
+        .shield-ring:nth-child(3) { width: 180%; height: 180%; top: -40%; left: -40%; animation-delay: 2s; }
+
+        @keyframes expandRing {
+            0% { transform: scale(0.8); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        .shield-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+        }
+
+        .security-features {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .security-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid rgba(245, 213, 224, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .security-item:hover {
+            background: rgba(102, 103, 171, 0.1);
+            border-color: rgba(102, 103, 171, 0.3);
+            transform: translateX(10px);
+        }
+
+        .security-check {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1rem;
+        }
+
+        .security-text h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .security-text p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+
+        /* ===== TESTIMONIALS ===== */
+        .testimonials {
+            padding: 100px 5%;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(180deg, var(--moon-deep) 0%, var(--moon-plum) 100%);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 3rem auto 0;
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(245, 213, 224, 0.1);
+            border-radius: 24px;
+            padding: 2rem;
+            position: relative;
+            backdrop-filter: blur(10px);
+            transition: all 0.4s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(245, 213, 224, 0.2);
+        }
+
+        .testimonial-stars {
+            color: #d4af37;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .testimonial-text {
+            font-size: 1rem;
+            line-height: 1.8;
+            opacity: 0.85;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--moon-lavender), var(--moon-orchid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .author-info h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .author-info p {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* ===== CTA SECTION ===== */
+        .cta-section {
+            padding: 100px 5%;
+            position: relative;
+            z-index: 1;
+            background: linear-gradient(135deg, var(--moon-plum) 0%, var(--moon-orchid) 50%, var(--moon-lavender) 100%);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(245, 213, 224, 0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-content {
+            position: relative;
+            z-index: 1;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-desc {
+            font-size: 1.1rem;
+            opacity: 0.85;
+            margin-bottom: 2.5rem;
+            line-height: 1.8;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            padding: 60px 5% 30px;
+            background: var(--moon-deep);
+            border-top: 1px solid rgba(245, 213, 224, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand .logo-container {
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            line-height: 1.7;
+            max-width: 300px;
+        }
+
+        .footer-links h4 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--moon-cream);
+        }
+
+        .footer-links a {
+            display: block;
+            color: var(--moon-cream);
+            text-decoration: none;
+            opacity: 0.6;
+            margin-bottom: 0.8rem;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--moon-lavender);
+            transform: translateX(5px);
+        }
+
+        .footer-bottom {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(245, 213, 224, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .footer-bottom p {
+            font-size: 0.85rem;
+            opacity: 0.5;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(245, 213, 224, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--moon-cream);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+        }
+
+        .social-links a:hover {
+            background: var(--moon-lavender);
+            transform: translateY(-3px);
+        }
+
+        /* ===== MOBILE RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero-visual { display: none; }
+            .hero-content {
+                max-width: 100%;
+                text-align: center;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .stats {
+                justify-content: center;
+                position: relative;
+                bottom: auto;
+                margin-top: 3rem;
+                left: 0;
+                right: 0;
+            }
+            .security-content { grid-template-columns: 1fr; }
+            .footer-content { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 70%;
+                height: 100vh;
+                background: rgba(33, 6, 53, 0.98);
+                flex-direction: column;
+                padding: 6rem 2rem;
+                transition: right 0.4s ease;
+                backdrop-filter: blur(20px);
+            }
+            .nav-links.active { right: 0; }
+            .menu-toggle { display: flex; }
+            h1 { font-size: 2.8rem; }
+            .stats { gap: 1.5rem; }
+            .stat-number { font-size: 1.8rem; }
+            .footer-content { grid-template-columns: 1fr; }
+            .steps-container { flex-direction: column; align-items: center; }
+            .step-connector { display: none; }
+        }
+
+        /* Scroll Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== LOADER ===== -->
+    <div class="loader-overlay" id="loader">
+        <div class="loader-logo">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="loaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#F5D5E0"/>
+                        <stop offset="50%" style="stop-color:#6667AB"/>
+                        <stop offset="100%" style="stop-color:#7B337E"/>
+                    </linearGradient>
+                    <linearGradient id="vaultGradLoader" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#6667AB"/>
+                        <stop offset="100%" style="stop-color:#F5D5E0"/>
+                    </linearGradient>
+                </defs>
+                <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#loaderGrad)" opacity="0.9"/>
+                <circle cx="24" cy="24" r="10" fill="none" stroke="url(#vaultGradLoader)" stroke-width="2" opacity="0.8"/>
+                <circle cx="24" cy="24" r="3" fill="#F5D5E0" opacity="0.9"/>
+                <circle cx="24" cy="8" r="2" fill="#F5D5E0" opacity="0.9">
+                    <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="8s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+        </div>
+        <div class="loader-text">Lunar<span>Vault</span></div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- ===== BACKGROUND EFFECTS ===== -->
+    <div class="stars-container" id="stars"></div>
+    <canvas id="particles"></canvas>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- ===== NAVIGATION ===== -->
+    <nav id="navbar">
+        <a href="#" class="logo-container">
+            <div class="logo-icon">
+                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="moonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#F5D5E0"/>
+                            <stop offset="50%" style="stop-color:#6667AB"/>
+                            <stop offset="100%" style="stop-color:#7B337E"/>
+                        </linearGradient>
+                        <linearGradient id="vaultGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6667AB"/>
+                            <stop offset="100%" style="stop-color:#F5D5E0"/>
+                        </linearGradient>
+                    </defs>
+                    <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#moonGrad)" opacity="0.9"/>
+                    <circle cx="24" cy="24" r="10" fill="none" stroke="url(#vaultGrad)" stroke-width="2" opacity="0.8"/>
+                    <circle cx="24" cy="24" r="3" fill="#F5D5E0" opacity="0.9"/>
+                    <circle cx="24" cy="8" r="2" fill="#F5D5E0" opacity="0.9">
+                        <animateTransform attributeName="transform" type="rotate" from="0 24 24" to="360 24 24" dur="8s" repeatCount="indefinite"/>
+                    </circle>
+                </svg>
+            </div>
+            <div class="logo-text">Lunar<span>Vault</span></div>
+        </a>
+        
+        <div class="nav-links" id="navLinks">
+            <a href="#features">Features</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#security">Security</a>
+            <a href="#testimonials">Reviews</a>
+            <a href="login.html" class="btn btn-secondary" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;">Sign In</a>
+        </div>
+        
+        <div class="menu-toggle" id="menuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <div class="badge">
+                <div class="badge-dot"></div>
+                Simple • Secure • Transparent
+            </div>
+            
+            <h1>
+                LunarVault<br>
+                <span class="highlight">Online</span>
+            </h1>
+            
+            <p class="subtitle">
+                Redefining Digital Banking for secure, scalable and intelligent financial growth under the moonlight.
+            </p>
+            
+            <div class="cta-group">
+                <a href="login.html" class="btn btn-primary">
+                    Login
+                    <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+                <a href="signup.html" class="btn btn-secondary">Open Account</a>
+            </div>
+        </div>
+
+        <div class="hero-visual">
+            <div class="floating-card" id="heroCard">
+                <div class="card-chip"></div>
+                <div class="card-number">**** **** **** 2847</div>
+                <div class="card-bottom">
+                    <div>
+                        <div style="font-size: 0.7rem; opacity: 0.6; margin-bottom: 0.2rem;">CARD HOLDER</div>
+                        <div class="card-holder">LUNAR CLIENT</div>
+                    </div>
+                    <div class="card-logo">LunarVault</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <span class="stat-number" id="stat1">0</span>
+                <span class="stat-label">% Success</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="stat2">0</span>
+                <span class="stat-label">K+ Clients</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="stat3">$0</span>
+                <span class="stat-label">B Assets</span>
+            </div>
+        </div>
+
+        <div class="scroll-indicator">
+            <span class="scroll-text">Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- ===== FEATURES SECTION ===== -->
+    <section class="features" id="features">
+        <div class="section-header reveal">
+            <div class="section-tag">Our Services</div>
+            <h2 class="section-title">Banking Reimagined</h2>
+            <p class="section-subtitle">Experience the future of finance with our cutting-edge digital banking solutions designed for the modern world.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="feature-icon">⚡</div>
+                <h3 class="feature-title">Instant Transfers</h3>
+                <p class="feature-desc">Send and receive money in real-time, 24/7. No delays, no waiting periods. Your funds move at the speed of light.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🔒</div>
+                <h3 class="feature-title">Military-Grade Security</h3>
+                <p class="feature-desc">256-bit encryption, biometric authentication, and real-time fraud monitoring keep your assets protected around the clock.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📊</div>
+                <h3 class="feature-title">Smart Analytics</h3>
+                <p class="feature-desc">AI-powered insights into your spending habits, investment opportunities, and financial health recommendations.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">🌍</div>
+                <h3 class="feature-title">Global Access</h3>
+                <p class="feature-desc">Bank from anywhere in the world. Multi-currency accounts with competitive exchange rates and zero hidden fees.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">💰</div>
+                <h3 class="feature-title">Wealth Growth</h3>
+                <p class="feature-desc">Automated savings goals, high-yield accounts, and curated investment portfolios tailored to your risk appetite.</p>
+            </div>
+            <div class="feature-card reveal">
+                <div class="feature-icon">📱</div>
+                <h3 class="feature-title">Mobile First</h3>
+                <p class="feature-desc">A seamless mobile experience with instant notifications, virtual cards, and contactless payments everywhere.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="how-it-works" id="how-it-works">
+        <div class="section-header reveal">
+            <div class="section-tag">Get Started</div>
+            <h2 class="section-title">Three Steps to Lunar Banking</h2>
+            <p class="section-subtitle">Join thousands of users who have already made the switch to smarter banking.</p>
+        </div>
+
+        <div class="steps-container">
+            <div class="step-card reveal">
+                <div class="step-number">1</div>
+                <div class="step-connector"></div>
+                <h3 class="step-title">Create Account</h3>
+                <p class="step-desc">Sign up in under 3 minutes with just your phone and ID. No paperwork, no branch visits required.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-number">2</div>
+                <div class="step-connector"></div>
+                <h3 class="step-title">Verify Identity</h3>
+                <p class="step-desc">Secure biometric verification ensures your identity is protected while keeping the process seamless.</p>
+            </div>
+            <div class="step-card reveal">
+                <div class="step-number">3</div>
+                <h3 class="step-title">Start Banking</h3>
+                <p class="step-desc">Fund your account and unlock the full suite of LunarVault features instantly. Welcome to the future.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== SECURITY SECTION ===== -->
+    <section class="security" id="security">
+        <div class="section-header reveal">
+            <div class="section-tag">Protection</div>
+            <h2 class="section-title">Your Security is Our Mission</h2>
+            <p class="section-subtitle">We employ the same encryption standards used by leading financial institutions worldwide.</p>
+        </div>
+
+        <div class="security-content">
+            <div class="security-visual reveal">
+                <div class="shield-animation">
+                    <div class="shield-ring"></div>
+                    <div class="shield-ring"></div>
+                    <div class="shield-ring"></div>
+                    <div class="shield-icon">🛡️</div>
+                </div>
+            </div>
+
+            <div class="security-features">
+                <div class="security-item reveal">
+                    <div class="security-check">✓</div>
+                    <div class="security-text">
+                        <h4>End-to-End Encryption</h4>
+                        <p>All data is encrypted in transit and at rest using AES-256 standards.</p>
+                    </div>
+                </div>
+                <div class="security-item reveal">
+                    <div class="security-check">✓</div>
+                    <div class="security-text">
+                        <h4>Biometric Authentication</h4>
+                        <p>Face ID, fingerprint, and voice recognition for multi-layered access control.</p>
+                    </div>
+                </div>
+                <div class="security-item reveal">
+                    <div class="security-check">✓</div>
+                    <div class="security-text">
+                        <h4>Real-Time Fraud Detection</h4>
+                        <p>AI monitors every transaction 24/7 to detect and prevent suspicious activity.</p>
+                    </div>
+                </div>
+                <div class="security-item reveal">
+                    <div class="security-check">✓</div>
+                    <div class="security-text">
+                        <h4>FDIC Insured Deposits</h4>
+                        <p>Your deposits are insured up to $250,000 for complete peace of mind.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TESTIMONIALS ===== -->
+    <section class="testimonials" id="testimonials">
+        <div class="section-header reveal">
+            <div class="section-tag">Testimonials</div>
+            <h2 class="section-title">Trusted by Thousands</h2>
+            <p class="section-subtitle">See what our community has to say about their LunarVault experience.</p>
+        </div>
+
+        <div class="testimonials-grid">
+            <div class="testimonial-card reveal">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"LunarVault completely transformed how I manage my finances. The instant transfers and smart analytics have saved me countless hours."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">S</div>
+                    <div class="author-info">
+                        <h4>Sarah Mitchell</h4>
+                        <p>Small Business Owner</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card reveal">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"The security features give me total peace of mind. I've never felt safer banking online. The mobile app is incredibly intuitive."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">J</div>
+                    <div class="author-info">
+                        <h4>James Okonkwo</h4>
+                        <p>Software Engineer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card reveal">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Switching from my traditional bank was the best decision. Zero fees, instant notifications, and the wealth growth tools are amazing."</p>
+                <div class="testimonial-author">
+                    <div class="author-avatar">E</div>
+                    <div class="author-info">
+                        <h4>Elena Rodriguez</h4>
+                        <p>Marketing Director</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CTA SECTION ===== -->
+    <section class="cta-section">
+        <div class="cta-content reveal">
+            <h2 class="cta-title">Ready to Join the Lunar Revolution?</h2>
+            <p class="cta-desc">Open your account today and experience banking that works as hard as you do. No monthly fees, no minimum balance.</p>
+            <div class="cta-buttons">
+                <a href="signup.html" class="btn btn-primary" style="background: var(--moon-cream); color: var(--moon-deep);">
+                    Open Free Account
+                    <svg class="btn-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </a>
+                <a href="login.html" class="btn btn-secondary" style="border-color: var(--moon-cream);">Sign In</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-brand">
+                <a href="#" class="logo-container">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="footMoon" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#F5D5E0"/>
+                                    <stop offset="50%" style="stop-color:#6667AB"/>
+                                    <stop offset="100%" style="stop-color:#7B337E"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M24 4C12.954 4 4 12.954 4 24s8.954 20 20 20c4.2 0 8.1-1.3 11.4-3.5C30.2 37.8 26 31.4 26 24s4.2-13.8 9.4-16.5C32.1 5.3 28.2 4 24 4z" fill="url(#footMoon)"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">Lunar<span>Vault</span></div>
+                </a>
+                <p>Redefining digital banking with security, transparency, and intelligent financial growth for everyone.</p>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Product</h4>
+                <a href="#features">Features</a>
+                <a href="#security">Security</a>
+                <a href="#">Pricing</a>
+                <a href="#">API</a>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="#">About</a>
+                <a href="#">Careers</a>
+                <a href="#">Press</a>
+                <a href="#">Contact</a>
+            </div>
+            
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Compliance</a>
+                <a href="#">Licenses</a>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p> 2026 LunarVault Bank. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#">𝕏</a>
+                <a href="#">in</a>
+                <a href="#">f</a>
+                <a href="#">📸</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== LOADER =====
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 2500);
+        });
+
+        // ===== STARS =====
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                star.style.setProperty('--duration', Math.random() * 3 + 2 + 's');
+                star.style.setProperty('--opacity', Math.random() * 0.7 + 0.3);
+                star.style.animationDelay = Math.random() * 5 + 's';
+                container.appendChild(star);
+            }
+            setInterval(() => {
+                const shooting = document.createElement('div');
+                shooting.className = 'shooting-star';
+                shooting.style.top = Math.random() * 50 + '%';
+                shooting.style.left = Math.random() * 50 + '%';
+                shooting.style.animationDuration = Math.random() * 2 + 1 + 's';
+                container.appendChild(shooting);
+                setTimeout(() => shooting.remove(), 3000);
+            }, 4000);
+        }
+
+        // ===== PARTICLES =====
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speedX: Math.random() * 0.5 - 0.25,
+                    speedY: Math.random() * 0.5 - 0.25,
+                    opacity: Math.random() * 0.5 + 0.2
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.y > canvas.height) p.y = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    
+                    ctx.fillStyle = `rgba(245, 213, 224, ${p.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                particles.forEach((a, i) => {
+                    particles.slice(i + 1).forEach(b => {
+                        const dx = a.x - b.x;
+                        const dy = a.y - b.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 150) {
+                            ctx.strokeStyle = `rgba(102, 103, 171, ${0.1 * (1 - dist / 150)})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(a.x, a.y);
+                            ctx.lineTo(b.x, b.y);
+                            ctx.stroke();
+                        }
+                    });
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // ===== ANIMATED COUNTERS =====
+        function animateCounter(element, target, prefix = '', suffix = '', duration = 2000) {
+            let start = 0;
+            const increment = target / (duration / 16);
+            function update() {
+                start += increment;
+                if (start < target) {
+                    element.textContent = prefix + Math.floor(start) + suffix;
+                    requestAnimationFrame(update);
+                } else {
+                    element.textContent = prefix + target + suffix;
+                }
+            }
+            update();
+        }
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateCounter(document.getElementById('stat1'), 100, '', '%');
+                    animateCounter(document.getElementById('stat2'), 280, '', 'K+');
+                    animateCounter(document.getElementById('stat3'), 1.4, '$', 'B');
+                    statsObserver.disconnect();
+                }
+            });
+        }, { threshold: 0.5 });
+
+        // ===== SCROLL REVEAL =====
+        function initScrollReveal() {
+            const reveals = document.querySelectorAll('.reveal');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            reveals.forEach(el => observer.observe(el));
+        }
+
+        // ===== NAVBAR SCROLL =====
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.classList.add('scrolled');
+            } else {
+                nav.classList.remove('scrolled');
+            }
+        });
+
+        // ===== MOBILE MENU =====
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+
+        // ===== MOUSE PARALLAX =====
+        document.addEventListener('mousemove', (e) => {
+            const card = document.getElementById('heroCard');
+            if (!card) return;
+            const x = (window.innerWidth / 2 - e.pageX) / 50;
+            const y = (window.innerHeight / 2 - e.pageY) / 50;
+            card.style.transform = `translateY(${-20 + y}px) rotateX(${10 + y}deg) rotateY(${-10 + x}deg)`;
+        });
+
+        // ===== INITIALIZE =====
+        window.addEventListener('DOMContentLoaded', () => {
+            createStars();
+            initParticles();
+            statsObserver.observe(document.querySelector('.stats'));
+            initScrollReveal();
+        });
+    </script>
+</body>
+</html>
